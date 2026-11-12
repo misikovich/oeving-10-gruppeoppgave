@@ -1,0 +1,40 @@
+import csv
+from pathlib import Path
+
+aar = input("Skriv inn årstall: ").strip()
+
+sommerdager = 0
+hoysommerdager = 0
+tropedager = 0
+
+filnavn = Path("oslo-blindern.csv") 
+
+with open(filnavn, encoding= "utf-8") as fil:
+    leser = csv.DictReader(fil, delimiter=";")
+
+    for rad in leser:
+        dato = rad["Tid(norsk normaltid)"]
+        temperatur = rad["Maksimumstemperatur (døgn)"]
+
+        # Hopper over andre år og tomme rader
+        if not dato or dato.split(".")[-1] != aar:
+            continue
+
+        try:
+            maks_temp = float(temperatur.replace(",", "."))
+        except (ValueError, AttributeError):
+            continue
+
+        if maks_temp > 20:
+            sommerdager += 1
+
+        if maks_temp > 25:
+            hoysommerdager += 1
+
+        if maks_temp > 30:
+            tropedager += 1
+
+print(f"Antall dager i {aar}:")
+print(f"Sommerdager: {sommerdager}")
+print(f"Høysommerdager: {hoysommerdager}")
+print(f"Tropedager: {tropedager}")
