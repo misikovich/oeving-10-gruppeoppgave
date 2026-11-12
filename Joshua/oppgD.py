@@ -1,6 +1,6 @@
 
-import csv
 import matplotlib.pyplot as plt
+from data.dataleser import les_fil
 
 # Lager 12 tomme lister, en for hver måned
 vind = {}
@@ -8,35 +8,18 @@ vind = {}
 for måned in range(1, 13):
     vind[måned] = []
 
-csv_fil = "data/oslo_blindern_1954_2025_med_makstemperatur.csv"
-# Leser CSV-filen
-with open(csv_fil, encoding="utf-8") as fil:
-    leser = csv.reader(fil, delimiter=";")
+# Leser CSV-filen (dataleser hopper over manglende målinger og gjør om til tall)
+for rad in les_fil("data/oslo_blindern_1954_2025_med_makstemperatur.csv"):
 
-    overskrift = next(leser)
+    dato = rad["Tid(norsk normaltid)"]
+    vindstyrke = rad["Høyeste middelvind (døgn)"]
 
-    # Finner plasseringen til dato og vind i CSV-filen
-    dato_plassering = overskrift.index("Tid(norsk normaltid)")
-    vind_plassering = overskrift.index("Høyeste middelvind (døgn)")
+    # Hopper over manglende målinger
+    if vindstyrke is None:
+        continue
 
-    for rad in leser:
-
-        dato = rad[dato_plassering]
-        vindstyrke = rad[vind_plassering]
-
-        # Hopper over manglende målinger
-        if vindstyrke == "-" or vindstyrke == "":
-            continue
-
-        # Henter ut måneden fra datoen
-        dato_deler = dato.split(".")
-        måned = int(dato_deler[1])
-
-        # Gjør vindstyrken om til et tall
-        vindstyrke = float(vindstyrke.replace(",", "."))
-
-        # Legger vindstyrken i riktig måned
-        vind[måned].append(vindstyrke)
+    # Legger vindstyrken i riktig måned
+    vind[dato.month].append(vindstyrke)
 
 
 # Lager lister for resultatene
@@ -48,6 +31,13 @@ maksimum = []
 for måned in range(1, 13):
 
     målinger = vind[måned]
+
+    # Hopper over måneder uten data
+    if len(målinger) == 0:
+        minimum.append(None)
+        median.append(None)
+        maksimum.append(None)
+        continue
 
     # Sorterer målingene
     målinger.sort()

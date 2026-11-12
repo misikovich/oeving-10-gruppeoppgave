@@ -13,3 +13,12 @@ pip install -r requirements.txt  # once a requirements.txt exists
 Activate the venv (`source .venv/bin/activate`) each time you open a new terminal. Run `deactivate` to leave it.
 
 If you add a new package, install it with `pip install <package>` and add it to `requirements.txt` so the others get it too.
+
+## Kjøre skript
+
+Skriptene leser data via `data/dataleser.py`. Kjør dem fra prosjektmappen med `-m` (mappe.fil, uten `.py`):
+
+```bash
+python3 -m Tymur.oppgA
+python3 -m Leancarlo.oppgB
+```

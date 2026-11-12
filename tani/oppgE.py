@@ -1,95 +1,48 @@
 
-import csv
-import glob
 import matplotlib.pyplot as plt
 import math
-from datetime import date, datetime
-import os
-
-
-# til_tall og til_dato fra oppgave 7 D
-def til_tall(tekst):
-    tekst = tekst.replace(",", ".").strip()
-
-    if tekst == "-" or tekst == "":
-        return None
-
-    return float(tekst)
-
-
-def til_dato(tekst):
-    tekst = tekst.strip()
-
-    try:
-        return datetime.strptime(tekst, "%Y-%m-%d")
-    except ValueError:
-        try:
-            return datetime.strptime(tekst, "%d.%m.%Y")
-        except ValueError:
-            return None
+from datetime import date
+from data.dataleser import les_fil, STASJONER
 
 
 # oppgave E
-def finn_skiføre(csv_sti):
+def finn_skiføre(stasjon):
     sesonger = {}
 
-    #velger riktig kolonne for snødybde basert på filnavn
-    if "sinnes" in csv_sti.lower():
-        snøkolonne = 6
-    else:
-        snøkolonne = 7
+    for rad in les_fil(stasjon):
 
-    with open(csv_sti, 'r', encoding='utf-8-sig') as fil:
-        leser = csv.reader(fil, delimiter=';')
-        next(leser, None)
+        dato = rad["Tid(norsk normaltid)"]
+        snødybde = rad["Snødybde"]
 
-        for rad in leser:
-            if len(rad) <= snøkolonne:
-                continue
+        if snødybde is None:
+            continue
 
-            dato = til_dato(rad[2])
+        if dato.month >= 11:
+            aar = dato.year + 1
+        elif dato.month <= 5:
+            aar = dato.year
+        else:
+            continue
 
-            if dato is None:
-                continue
+        if aar not in sesonger:
+            sesonger[aar] = {
+                "måledager": set(),
+                "skiføredager": set()
+            }
 
-            snødybde = til_tall(rad[snøkolonne])
+        sesonger[aar]["måledager"].add(dato)
 
-            if snødybde is None:
-                continue
-
-            if dato.month >= 11:
-                aar = dato.year + 1
-            elif dato.month <= 5:
-                aar = dato.year
-            else:
-                continue
-
-            if aar not in sesonger:
-                sesonger[aar] = {
-                    "måledager": set(),
-                    "skiføredager": set()
-                }
-
-            sesonger[aar]["måledager"].add(dato)
-
-            if snødybde >= 20:
-                sesonger[aar]["skiføredager"].add(dato)
+        if snødybde >= 20:
+            sesonger[aar]["skiføredager"].add(dato)
 
     return sesonger
 
 
-#csv-filene
-
-filer = (
-    glob.glob(os.path.join("data", "*_med_makstemperatur.csv"))
-    + glob.glob(os.path.join("data", "*sinnes*.csv"))
-)
-
 plt.figure(figsize=(12, 6))
 
-for csv_sti in filer:
+for stasjon in STASJONER:
 
-    sesonger = finn_skiføre(csv_sti)
+    sesonger = finn_skiføre(stasjon)
 
     årstall = []
     antall_dager = []
@@ -105,23 +58,13 @@ for csv_sti in filer:
 
         måledager = len(sesonger[aar]["måledager"])
 
-        
+
         if måledager >= krav:
 
             skiføredager = len(sesonger[aar]["skiføredager"])
 
             årstall.append(aar)
             antall_dager.append(skiføredager)
-
-    
-    stasjon = os.path.basename(csv_sti)
-
-    if "sinnes" in stasjon.lower():
-        stasjon = "Sinnes"
-    else:
-        stasjon = stasjon.replace(
-            "_1954_2025_med_makstemperatur.csv", ""
-        )
 
     #grafene
     plt.plot(

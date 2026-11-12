@@ -1,47 +1,31 @@
-import csv
-import os
 from datetime import datetime
 import matplotlib.pyplot as plt
+from data.dataleser import les_fil
 
-csv_fil = os.path.join("data", "sinnes_2014_2025.csv")
+csv_fil = "data/sinnes_2014_2025.csv"
 stasjon = "Sinnes"
 
+kolonner = {
+    "temp": "Middeltemperatur (døgn)",
+    "nedbør": "Nedbør (døgn)",
+    "vind": "Høyeste middelvind (døgn)",
+    "snø": "Snødybde",
+}
 
-def til_tall(tekst):
-    tekst = tekst.replace(",", ".").strip()
-    if tekst == "-" or tekst == "":
-        return None
-    return float(tekst)
-
-
-# måneder[(år, måned)] = lister med gyldige målinger
+# dikt (år, måned) for å liste gyldige måneder 
 måneder = {}
 
-with open(csv_fil, encoding="utf-8-sig") as fil:
-    leser = csv.reader(fil, delimiter=";")
-    overskrift = next(leser)
+for rad in les_fil(csv_fil):
+    dato = rad["Tid(norsk normaltid)"]
 
-    kolonner = {
-        "temp": overskrift.index("Middeltemperatur (døgn)"),
-        "nedbør": overskrift.index("Nedbør (døgn)"),
-        "vind": overskrift.index("Høyeste middelvind (døgn)"),
-        "snø": overskrift.index("Snødybde"),
-    }
+    nøkkel = (dato.year, dato.month)
+    if nøkkel not in måneder:
+        måneder[nøkkel] = {"temp": [], "nedbør": [], "vind": [], "snø": []}
 
-    for rad in leser:
-        try:
-            dato = datetime.strptime(rad[2], "%d.%m.%Y")
-        except (ValueError, IndexError):
-            continue
-
-        nøkkel = (dato.year, dato.month)
-        if nøkkel not in måneder:
-            måneder[nøkkel] = {"temp": [], "nedbør": [], "vind": [], "snø": []}
-
-        for navn in kolonner:
-            verdi = til_tall(rad[kolonner[navn]])
-            if verdi is not None:
-                måneder[nøkkel][navn].append(verdi)
+    for navn in kolonner:
+        verdi = rad[kolonner[navn]]
+        if verdi is not None:
+            måneder[nøkkel][navn].append(verdi)
 
 
 def maks(liste):

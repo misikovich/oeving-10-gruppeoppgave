@@ -1,0 +1,12 @@
+{
+    // Lar skript i undermapper importere data.dataleser (Run-knappen)
+    "terminal.integrated.env.osx": { "PYTHONPATH": "${workspaceFolder}" },
+    "terminal.integrated.env.linux": { "PYTHONPATH": "${workspaceFolder}" },
+    "terminal.integrated.env.windows": { "PYTHONPATH": "${workspaceFolder}" },
+
+    // Kjør fra prosjektmappen, så "data/fil.csv" finnes
+    "python.terminal.executeInFileDir": false,
+
+    // Fjerner gul strek under "from data.dataleser import ..."
+    "python.analysis.extraPaths": ["${workspaceFolder}"]
+}

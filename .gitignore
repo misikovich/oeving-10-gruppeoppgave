@@ -11,6 +11,5 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Editors / OS
-.vscode/
 .idea/
 .DS_Store
