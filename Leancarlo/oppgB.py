@@ -7,7 +7,8 @@ sommerdager = 0
 hoysommerdager = 0
 tropedager = 0
 
-filnavn = Path("oslo-blindern.csv") 
+# CSV-filen ligger i data/-mappen
+filnavn = "data/oslo_blindern_1954_2025_med_makstemperatur.csv"
 
 with open(filnavn, encoding= "utf-8") as fil:
     leser = csv.DictReader(fil, delimiter=";")

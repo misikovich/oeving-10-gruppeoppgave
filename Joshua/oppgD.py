@@ -8,7 +8,7 @@ vind = {}
 for måned in range(1, 13):
     vind[måned] = []
 
-csv_fil = "Joshua/oslo_blindern_1954_2025_med_makstemperatur.csv"
+csv_fil = "data/oslo_blindern_1954_2025_med_makstemperatur.csv"
 # Leser CSV-filen
 with open(csv_fil, encoding="utf-8") as fil:
     leser = csv.reader(fil, delimiter=";")

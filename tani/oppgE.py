@@ -80,11 +80,9 @@ def finn_skiføre(csv_sti):
 
 #csv-filene
 
-mappe = os.path.dirname(os.path.abspath(__file__))
-
 filer = (
-    glob.glob(os.path.join(mappe, "*_med_makstemperatur.csv"))
-    + glob.glob(os.path.join(mappe, "*sinnes*.csv"))
+    glob.glob(os.path.join("data", "*_med_makstemperatur.csv"))
+    + glob.glob(os.path.join("data", "*sinnes*.csv"))
 )
 
 plt.figure(figsize=(12, 6))
